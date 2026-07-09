@@ -5,8 +5,13 @@ covering the BMS and HSG-HDD programs for Work Week 28.
 
 ## View
 
-Open [`weekly-report-ww28.html`](./weekly-report-ww28.html) in any modern browser.
+Open [`index.html`](./index.html) in any modern browser.
 Everything is self-contained (inline CSS/JS, no external dependencies).
+
+Because the report is named `index.html`, static hosts (Vercel, Netlify,
+GitHub Pages, …) serve it at the site root automatically — no extra config.
+
+> Access code: `chai888`
 
 ## Contents
 
