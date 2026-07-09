@@ -148,9 +148,9 @@ section.blk{padding:30px 0}
 /* ---------- timeline ---------- */
 .tlcard{padding:22px 8px 14px}
 .tlcard .pad{padding:0 14px}
-.tlscroll{overflow-x:auto;padding:8px 4px 6px}
+.tlscroll{overflow-x:auto;overflow-y:hidden;padding:8px 4px 6px}
 .tl{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(148px,1fr);
-  min-width:820px;padding:70px 0}
+  min-width:820px;padding:170px 0}
 .tl::before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;
   background:linear-gradient(90deg,var(--line-strong),var(--accent),var(--line-strong))}
 .node{position:relative;text-align:center;padding:0 8px}
@@ -366,7 +366,7 @@ const DATA=[
  {div:"BMS",prog:"ONE Drone",ic:"OD",status:"good",statusText:"On Track",
   lead:"Tooling design for 6 models — grouped into two fixtures, with FPCA flow defined for assembly.",
   groups:[
-    {t:"4 models in same fixture",tool:"TL-26-2918",pns:["NZYKV8-01","NZYKV9-01","NZYKW1-01"]},
+    {t:"4 models in same fixture",tool:"TL-26-2918",pns:["NZYKV7-01","NZYKV8-01","NZYKV9-01","NZYKW1-01"]},
     {t:"2 models · Common Top & Bottom",tool:"TL-26-2919",pns:["NZYKW2-01","NZYKW3-01"]}
   ],
   tags:[{k:"Scope",v:"6 models"},{k:"Deliverable",v:"FPCA flow"}],
