@@ -1,0 +1,555 @@
+<title>Chai · Weekly Engineering Report WW#28</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  /* Blueprint blue & white system */
+  --bg:#eef4fb;
+  --panel:#ffffff;
+  --panel-2:#f6f9fe;
+  --ink:#0d2238;
+  --ink-2:#38506b;
+  --muted:#6c839d;
+  --line:#d6e3f2;
+  --line-strong:#b9cfe8;
+  --accent:#1567e0;
+  --accent-2:#0a4bb0;
+  --accent-soft:#e4eeff;
+  --grid:rgba(21,103,224,.07);
+  --grid-strong:rgba(21,103,224,.13);
+  --good:#0f9d58;
+  --good-soft:#e2f6ec;
+  --warn:#d98005;
+  --warn-soft:#fdf0dc;
+  --pend:#5b6b7f;
+  --pend-soft:#e9eef4;
+  --shadow:0 1px 2px rgba(13,34,56,.06),0 12px 30px -12px rgba(13,34,56,.18);
+  --shadow-lg:0 1px 2px rgba(13,34,56,.08),0 30px 60px -24px rgba(13,34,56,.32);
+  --font:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Code","Segoe UI Mono","Roboto Mono",Menlo,Consolas,monospace;
+  --r:16px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0a1622;--panel:#0f2032;--panel-2:#132844;--ink:#e8f1fc;--ink-2:#b6cce6;
+    --muted:#7f9bba;--line:#1e3856;--line-strong:#2a4a70;
+    --accent:#4a9bff;--accent-2:#7bb6ff;--accent-soft:#132f55;
+    --grid:rgba(90,160,255,.08);--grid-strong:rgba(90,160,255,.14);
+    --good:#37c98a;--good-soft:#0f3326;--warn:#f0a83a;--warn-soft:#3a2a0e;
+    --pend:#9db2c9;--pend-soft:#1c2f45;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 34px -14px rgba(0,0,0,.6);
+    --shadow-lg:0 1px 2px rgba(0,0,0,.5),0 34px 64px -22px rgba(0,0,0,.75);
+  }
+}
+:root[data-theme="light"]{
+  --bg:#eef4fb;--panel:#ffffff;--panel-2:#f6f9fe;--ink:#0d2238;--ink-2:#38506b;
+  --muted:#6c839d;--line:#d6e3f2;--line-strong:#b9cfe8;--accent:#1567e0;--accent-2:#0a4bb0;
+  --accent-soft:#e4eeff;--grid:rgba(21,103,224,.07);--grid-strong:rgba(21,103,224,.13);
+  --good:#0f9d58;--good-soft:#e2f6ec;--warn:#d98005;--warn-soft:#fdf0dc;--pend:#5b6b7f;--pend-soft:#e9eef4;
+  --shadow:0 1px 2px rgba(13,34,56,.06),0 12px 30px -12px rgba(13,34,56,.18);
+  --shadow-lg:0 1px 2px rgba(13,34,56,.08),0 30px 60px -24px rgba(13,34,56,.32);
+}
+:root[data-theme="dark"]{
+  --bg:#0a1622;--panel:#0f2032;--panel-2:#132844;--ink:#e8f1fc;--ink-2:#b6cce6;
+  --muted:#7f9bba;--line:#1e3856;--line-strong:#2a4a70;--accent:#4a9bff;--accent-2:#7bb6ff;
+  --accent-soft:#132f55;--grid:rgba(90,160,255,.08);--grid-strong:rgba(90,160,255,.14);
+  --good:#37c98a;--good-soft:#0f3326;--warn:#f0a83a;--warn-soft:#3a2a0e;--pend:#9db2c9;--pend-soft:#1c2f45;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 34px -14px rgba(0,0,0,.6);
+  --shadow-lg:0 1px 2px rgba(0,0,0,.5),0 34px 64px -22px rgba(0,0,0,.75);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
+  line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px),
+    linear-gradient(var(--grid-strong) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid-strong) 1px,transparent 1px);
+  background-size:28px 28px,28px 28px,140px 140px,140px 140px;
+  -webkit-mask-image:radial-gradient(120% 90% at 50% 0,#000 40%,transparent 100%);
+  mask-image:radial-gradient(120% 90% at 50% 0,#000 40%,transparent 100%);
+}
+.wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 22px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);
+  background:color-mix(in srgb,var(--bg) 78%,transparent);
+  border-bottom:1px solid var(--line);
+}
+.topbar .row{display:flex;align-items:center;gap:14px;height:60px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:.2px}
+.logo{width:30px;height:30px;border-radius:8px;background:
+  linear-gradient(135deg,var(--accent),var(--accent-2));position:relative;flex:none;
+  box-shadow:0 4px 14px -4px var(--accent)}
+.logo::after{content:"";position:absolute;inset:6px;border:1.5px solid rgba(255,255,255,.85);border-radius:3px}
+.logo::before{content:"";position:absolute;left:6px;right:6px;top:50%;height:1.5px;background:rgba(255,255,255,.85)}
+.brand small{display:block;font-weight:500;color:var(--muted);font-size:11px;letter-spacing:.4px}
+.spacer{flex:1}
+.wwbadge{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent-2);
+  background:var(--accent-soft);border:1px solid var(--line-strong);padding:5px 10px;border-radius:999px}
+.tgl{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--panel);
+  color:var(--ink);cursor:pointer;display:grid;place-items:center;font-size:16px;transition:.2s}
+.tgl:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ---------- hero ---------- */
+.hero{padding:56px 0 30px;position:relative}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12px;
+  letter-spacing:2px;text-transform:uppercase;color:var(--accent-2);font-weight:600;margin-bottom:18px}
+.eyebrow::before{content:"";width:26px;height:1.5px;background:var(--accent)}
+.hero h1{font-size:clamp(30px,5.4vw,52px);line-height:1.03;margin:0 0 14px;letter-spacing:-1.2px;
+  font-weight:800;text-wrap:balance;max-width:16ch}
+.hero h1 .hl{color:var(--accent)}
+.hero .sub{font-size:clamp(15px,2vw,18px);color:var(--ink-2);max-width:60ch;margin:0}
+.metaline{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:22px;color:var(--muted);font-size:13.5px}
+.metaline b{color:var(--ink-2);font-weight:600}
+.metaline span{display:inline-flex;align-items:center;gap:7px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:38px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px 18px 16px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.kpi .n{font-size:38px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums;line-height:1}
+.kpi .l{color:var(--muted);font-size:12.5px;margin-top:8px;letter-spacing:.2px}
+.kpi .s{font-family:var(--mono);font-size:11px;color:var(--accent-2);margin-top:3px}
+
+/* ---------- section ---------- */
+section.blk{padding:30px 0}
+.shead{display:flex;align-items:baseline;gap:14px;margin:6px 0 20px}
+.shead .num{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:600}
+.shead h2{font-size:22px;margin:0;letter-spacing:-.4px;font-weight:750}
+.shead .hint{margin-left:auto;color:var(--muted);font-size:12.5px}
+
+/* ---------- overview grid (donut + timeline) ---------- */
+.overview{display:grid;grid-template-columns:300px 1fr;gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.donutcard{padding:22px;display:flex;flex-direction:column}
+.donutcard h3,.tlcard h3{margin:0 0 4px;font-size:15px;font-weight:700}
+.donutcard .cap,.tlcard .cap{color:var(--muted);font-size:12px;margin:0 0 18px}
+.donutwrap{display:flex;align-items:center;gap:18px}
+.donut{width:132px;height:132px;flex:none;position:relative}
+.donut svg{transform:rotate(-90deg)}
+.donut .mid{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.donut .mid b{font-size:26px;font-weight:800;line-height:1}
+.donut .mid span{font-size:10.5px;color:var(--muted);letter-spacing:.5px}
+.leg{display:flex;flex-direction:column;gap:11px;flex:1}
+.leg .it{display:flex;align-items:center;gap:9px;font-size:13px;cursor:pointer;transition:.15s}
+.leg .it:hover{transform:translateX(2px)}
+.leg .sw{width:11px;height:11px;border-radius:3px;flex:none}
+.leg .it b{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:700}
+.leg .it small{color:var(--muted);font-size:11px}
+
+/* ---------- timeline ---------- */
+.tlcard{padding:22px 8px 14px}
+.tlcard .pad{padding:0 14px}
+.tlscroll{overflow-x:auto;padding:8px 4px 6px}
+.tl{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(148px,1fr);
+  min-width:820px;padding:70px 0}
+.tl::before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;
+  background:linear-gradient(90deg,var(--line-strong),var(--accent),var(--line-strong))}
+.node{position:relative;text-align:center;padding:0 8px}
+.node .tick{width:15px;height:15px;border-radius:50%;background:var(--panel);border:3px solid var(--accent);
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;transition:.2s;cursor:pointer}
+.node .tick.warn{border-color:var(--warn)}
+.node:hover .tick{transform:translate(-50%,-50%) scale(1.35);box-shadow:0 0 0 6px var(--accent-soft)}
+.node .stem{position:absolute;left:50%;width:1.5px;background:var(--line-strong);transform:translateX(-50%)}
+.node.up .stem{bottom:50%;height:34px}
+.node.dn .stem{top:50%;height:34px}
+.node .box{position:absolute;left:50%;transform:translateX(-50%);width:138px}
+.node.up .box{bottom:calc(50% + 40px)}
+.node.dn .box{top:calc(50% + 40px)}
+.node .date{font-family:var(--mono);font-weight:700;font-size:12.5px;color:var(--accent-2)}
+.node .evs{margin-top:5px;display:flex;flex-direction:column;gap:5px}
+.ev{background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:6px 8px;font-size:11px;
+  text-align:left;line-height:1.3;transition:.18s}
+.ev:hover{border-color:var(--accent);box-shadow:var(--shadow)}
+.ev b{display:block;font-size:11px;color:var(--ink)}
+.ev span{color:var(--muted);font-size:10.5px}
+.ev.warn{border-left:3px solid var(--warn)}
+.ev.good{border-left:3px solid var(--good)}
+
+/* ---------- controls ---------- */
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:22px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--ink-2);padding:8px 15px;border-radius:999px;
+  font-size:13px;font-weight:600;cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:7px}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 6px 16px -6px var(--accent)}
+.chip .c{font-family:var(--mono);font-size:11px;opacity:.85}
+.search{position:relative;margin-left:auto;flex:1;min-width:200px;max-width:320px}
+.search input{width:100%;padding:9px 14px 9px 36px;border:1px solid var(--line);border-radius:999px;
+  background:var(--panel);color:var(--ink);font-size:13px;font-family:var(--font);outline:none;transition:.18s}
+.search input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--muted)}
+
+/* ---------- project cards ---------- */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.pcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
+  overflow:hidden;display:flex;flex-direction:column;transition:.25s;will-change:transform}
+.pcard:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--line-strong)}
+.pcard.hide{display:none}
+.pc-top{padding:16px 18px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;
+  border-bottom:1px solid var(--line)}
+.pc-top .ic{width:40px;height:40px;border-radius:11px;flex:none;display:grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent-2);font-weight:800;font-size:15px;font-family:var(--mono)}
+.pc-tt{flex:1;min-width:0}
+.pc-tt .div{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+.pc-tt h3{margin:2px 0 0;font-size:16.5px;font-weight:750;letter-spacing:-.2px}
+.badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap;flex:none;
+  display:inline-flex;align-items:center;gap:5px}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.badge.good{color:var(--good);background:var(--good-soft)}
+.badge.warn{color:var(--warn);background:var(--warn-soft)}
+.badge.pend{color:var(--pend);background:var(--pend-soft)}
+.pc-body{padding:14px 18px 4px;display:flex;flex-direction:column;gap:13px}
+.pc-lead{font-size:13.5px;color:var(--ink-2);margin:0}
+.subgrp{border:1px dashed var(--line-strong);border-radius:12px;padding:11px 12px;background:var(--panel-2)}
+.subgrp .sg-h{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;margin-bottom:9px}
+.tool{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent-2);background:var(--accent-soft);
+  border:1px solid var(--line-strong);padding:2px 8px;border-radius:6px;margin-left:auto}
+.pns{display:flex;flex-wrap:wrap;gap:6px}
+.pn{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--ink);background:var(--panel);
+  border:1px solid var(--line);border-radius:6px;padding:3px 8px;transition:.15s}
+.pn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.pn.hit{border-color:var(--warn);background:var(--warn-soft);color:var(--warn)}
+.note{font-size:12.5px;color:var(--ink-2);background:var(--panel-2);border-left:3px solid var(--line-strong);
+  border-radius:0 8px 8px 0;padding:8px 12px;margin:0}
+.note.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:11px;color:var(--ink-2);background:var(--panel-2);border:1px solid var(--line);
+  border-radius:6px;padding:3px 8px;display:inline-flex;gap:5px;align-items:center}
+.tag b{color:var(--ink);font-weight:600;font-family:var(--mono);font-size:11px}
+.pc-foot{margin-top:auto;padding:12px 18px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 16px;
+  background:var(--panel-2)}
+.milestone{display:flex;align-items:center;gap:8px;font-size:12px}
+.milestone .k{color:var(--muted)}
+.milestone .v{font-family:var(--mono);font-weight:700;font-size:12px}
+.milestone .v.rec{color:var(--accent-2)}
+.milestone .v.load{color:var(--good)}
+.milestone .v.unk{color:var(--pend)}
+
+.empty{display:none;text-align:center;padding:50px 20px;color:var(--muted);
+  border:1px dashed var(--line-strong);border-radius:var(--r);grid-column:1/-1}
+.empty.show{display:block}
+
+/* ---------- collapsible ---------- */
+.collapse{max-height:2000px;overflow:hidden;transition:max-height .4s ease}
+.pcard.collapsed .collapse{max-height:0}
+.pc-top .caret{transition:.3s;color:var(--muted);flex:none;margin-top:4px}
+.pcard.collapsed .pc-top .caret{transform:rotate(-90deg)}
+
+/* ---------- footer ---------- */
+footer{margin-top:40px;border-top:1px solid var(--line);padding:34px 0 60px}
+.sig{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.sig .av{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#fff;display:grid;place-items:center;font-weight:800;font-size:19px;flex:none;box-shadow:var(--shadow)}
+.sig .who b{font-size:16px}
+.sig .who div{color:var(--muted);font-size:13px}
+.sig .co{margin-left:auto;text-align:right;color:var(--muted);font-size:12px;font-family:var(--mono)}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .6s cubic-bezier(.2,.7,.2,1),transform .6s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+
+@media (max-width:860px){
+  .overview{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:480px){
+  .hero{padding:40px 0 20px}
+  .kpi .n{font-size:30px}
+  .sig .co{margin-left:0;text-align:left;width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
+
+<div class="topbar">
+  <div class="wrap row">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>Chai · Weekly<small>Assembly / Tooling Engineering</small></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="wwbadge">WW#28 · 06–10 Jul 2026</div>
+    <button class="tgl" id="themeBtn" aria-label="Toggle theme" title="Toggle light / dark">◐</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- HERO -->
+  <header class="hero rv">
+    <div class="eyebrow">Weekly Engineering Report · Draft to P'Choke</div>
+    <h1>Tooling &amp; Assembly Status, <span class="hl">Work Week 28</span></h1>
+    <p class="sub">Fixture design, stencil and reflow tooling progress across BMS and HSG-HDD programs — with every plan-receive and plan-load milestone tracked toward the July load windows.</p>
+    <div class="metaline">
+      <span><span class="dot"></span> <b>06–10 Jul 2026</b></span>
+      <span><span class="dot"></span> Prepared by <b>Sittichai&nbsp;Laotup</b></span>
+      <span><span class="dot"></span> <b>Mektec Manufacturing (Thailand)</b></span>
+      <span><span class="dot"></span> Draft saved <b>Thu 09-Jul-26</b></span>
+    </div>
+
+    <div class="kpis" id="kpis">
+      <div class="kpi rv"><div class="n" data-to="2">0</div><div class="l">Business Divisions</div><div class="s">BMS · HSG-HDD</div></div>
+      <div class="kpi rv"><div class="n" data-to="8">0</div><div class="l">Active Programs</div><div class="s">tracked this week</div></div>
+      <div class="kpi rv"><div class="n" data-to="7">0</div><div class="l">Tooling / Stencil Refs</div><div class="s">TL-26-xxxx</div></div>
+      <div class="kpi rv"><div class="n" data-to="7">0</div><div class="l">July Milestones</div><div class="s">receive &amp; load</div></div>
+    </div>
+  </header>
+
+  <!-- OVERVIEW -->
+  <section class="blk">
+    <div class="shead rv"><span class="num">01</span><h2>Program health &amp; delivery outlook</h2>
+      <span class="hint">hover the timeline &amp; legend</span></div>
+    <div class="overview">
+      <div class="card donutcard rv">
+        <h3>Status mix</h3>
+        <p class="cap">8 programs by delivery risk</p>
+        <div class="donutwrap">
+          <div class="donut">
+            <svg width="132" height="132" viewBox="0 0 132 132" id="donut"></svg>
+            <div class="mid"><div><b id="donutTotal">8</b><br><span>PROGRAMS</span></div></div>
+          </div>
+          <div class="leg" id="legend"></div>
+        </div>
+      </div>
+
+      <div class="card tlcard rv">
+        <div class="pad"><h3>July delivery timeline</h3>
+          <p class="cap">Plan-receive &amp; plan-load milestones · alternating above / below the line</p></div>
+        <div class="tlscroll"><div class="tl" id="timeline"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRAMS -->
+  <section class="blk">
+    <div class="shead rv"><span class="num">02</span><h2>Program detail</h2>
+      <span class="hint">filter &amp; search below</span></div>
+
+    <div class="controls rv">
+      <div class="chips" id="chips">
+        <button class="chip" data-f="all" aria-pressed="true">All programs <span class="c" id="cAll"></span></button>
+        <button class="chip" data-f="BMS" aria-pressed="false">BMS <span class="c" id="cBMS"></span></button>
+        <button class="chip" data-f="HSG-HDD" aria-pressed="false">HSG-HDD <span class="c" id="cHSG"></span></button>
+      </div>
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="q" type="search" placeholder="Search part no. / tooling / model…" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty">No programs match “<span id="qEcho"></span>”. Try a different part number.</div>
+  </section>
+
+  <footer class="rv">
+    <div class="sig">
+      <div class="av">SL</div>
+      <div class="who"><b>Sittichai Laotup</b><div>Assembly Engineer · Mektec Manufacturing Corporation (Thailand) Ltd.</div></div>
+      <div class="co">WW#28 · 06–10 JUL 2026<br>DRAFT · 09-JUL-26 16:39</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+const DATA=[
+ {div:"BMS",prog:"ONE Drone",ic:"OD",status:"good",statusText:"On Track",
+  lead:"Tooling design for 6 models — grouped into two fixtures, with FPCA flow defined for assembly.",
+  groups:[
+    {t:"4 models in same fixture",tool:"TL-26-2918",pns:["NZYKV8-01","NZYKV9-01","NZYKW1-01"]},
+    {t:"2 models · Common Top & Bottom",tool:"TL-26-2919",pns:["NZYKW2-01","NZYKW3-01"]}
+  ],
+  tags:[{k:"Scope",v:"6 models"},{k:"Deliverable",v:"FPCA flow"}],
+  rec:"20-Jul",load:"23-Jul"},
+
+ {div:"BMS",prog:"NVgotion",ic:"NV",status:"warn",statusText:"Urgent",
+  lead:"Urgently draft 12 NVgotion models for cost estimation.",
+  note:{t:"In a 700 × 400 mm fixture we can place 4 pcs / fixture.",w:false},
+  tags:[{k:"Models",v:"12"},{k:"Fixture",v:"700×400"},{k:"Layout",v:"4 pcs/fix"},{k:"Purpose",v:"Cost est."}]},
+
+ {div:"BMS",prog:"Shinzung ASH FORD",ic:"SZ",status:"pend",statusText:"Partly Pending",
+  lead:"Two models — NZGQL3-01 on schedule; NZGQV8-01 pending official SOO before tooling design.",
+  groups:[
+    {t:"Tooling design",tool:"—",pns:["NZGQL3-01"],sub:"Receive 20-Jul · Load 22-Jul",good:true},
+    {t:"Awaiting SOO official",tool:"—",pns:["NZGQV8-01"],sub:"Tooling design not yet started",pend:true}
+  ],
+  note:{t:"NZGQV8-01 tooling design not yet started — waiting for official SOO. Receive & load dates unknown.",w:false},
+  rec:"20-Jul",recNote:"NZGQL3-01",load:"22-Jul",loadNote:"NZGQL3-01"},
+
+ {div:"BMS",prog:"CEC",ic:"CE",status:"warn",statusText:"At Risk · Material",
+  lead:"Stencil DOE support for SNSG tab falling, plus repeat reflow fixtures and repeat covers — cover material currently out of stock.",
+  groups:[
+    {t:"SNSG tab falling — Stencil DOE",tool:"—",pns:[],sub:"Support DOE concept · Plan test: waiting line (stencil received)"},
+    {t:"Repeat reflow fixture",tool:"TL-26-2756",pns:["NT5758-X2A","NT5759-X2A"],sub:"5 set each · receive WW#29"},
+    {t:"Repeat cover",tool:"TL-26-2848",pns:[],sub:"PO from MKFF: 10 set/model (stock limit)"}
+  ],
+  note:{t:"SUS430 cover material 0.080 mm out of stock — supplier est. end-Jul is too late. Purchasing limited to 10 set/model from MKFF due to stock. Plan receive 15-Jul.",w:true},
+  rec:"15-Jul",recNote:"cover / WW#29 fixture"},
+
+ {div:"BMS",prog:"Volkswagen",ic:"VW",status:"good",statusText:"On Track",
+  lead:"Repeat reflow fixtures for a 4-model production requirement.",
+  tags:[{k:"Sent to production",v:"18 set/model"},{k:"Extra request",v:"7 set/model"},{k:"Ref",v:"TL-26-2955"}],
+  note:{t:"18 set/model already delivered to production. 7 set/model more requested (ref TL-26-2955).",w:false},
+  rec:"16-Jul",recNote:"+7 set/model"},
+
+ {div:"HSG-HDD",prog:"Comet 8233",ic:"C8",status:"good",statusText:"On Track",
+  lead:"Photo panel program, 4 pcs / panel, SH target 95-85-95.",
+  groups:[{t:"Stencil · A1A + A1B",tool:"TL-26-2941",pns:["NZGPZ7-01"],sub:"Photo panel 4 pcs/panel"}],
+  tags:[{k:"SH target",v:"95-85-95"},{k:"Panel",v:"4 pcs"}],
+  rec:"WW#29",load:"22-Jul"},
+
+ {div:"HSG-HDD",prog:"Dorado 5D 8231",ic:"D5",status:"good",statusText:"On Track",
+  lead:"Two models (NT6655-19 / NT6656-16), SH target all 82.",
+  groups:[{t:"Stencil · NT6585-A1B",tool:"TL-26-2949",pns:["NT6655-19","NT6656-16"],sub:"SH target all 82"}],
+  tags:[{k:"SH target",v:"82 / 82"}],
+  rec:"WW#29",load:"Aug 2026"},
+
+ {div:"HSG-HDD",prog:"Marlin 10D",ic:"M10",status:"good",statusText:"On Track",
+  lead:"Two models (NT5867-16 / NT6048-11), SH target 92-77-92, loading almost every day.",
+  groups:[{t:"Stencil · NT4051-A1L",tool:"TL-26-2949",pns:["NT5867-16","NT6048-11"],sub:"SH target 92-77-92"}],
+  tags:[{k:"SH target",v:"92-77-92"}],
+  rec:"WW#29",load:"Almost everyday"}
+];
+
+const TIMELINE=[
+ {date:"15 Jul",warn:true,evs:[{p:"CEC",t:"Repeat cover receive",cls:"warn"}]},
+ {date:"16 Jul",evs:[{p:"Volkswagen",t:"Reflow fixture +7 set",cls:"good"}]},
+ {date:"20 Jul",evs:[{p:"ONE Drone",t:"Tooling receive",cls:"good"},{p:"Shinzung",t:"NZGQL3-01 receive",cls:"good"}]},
+ {date:"22 Jul",evs:[{p:"Shinzung",t:"NZGQL3-01 load",cls:"good"},{p:"Comet 8233",t:"Panel load",cls:"good"}]},
+ {date:"23 Jul",evs:[{p:"ONE Drone",t:"Fixture load",cls:"good"}]},
+ {date:"WW#29",evs:[{p:"CEC · Comet",t:"Fixture / stencil receive",cls:"good"},{p:"Dorado · Marlin",t:"Stencil receive",cls:"good"}]},
+ {date:"Aug '26",evs:[{p:"Dorado 5D",t:"Panel load",cls:"good"}]}
+];
+
+const STATUS={good:{c:"var(--good)",label:"On Track"},warn:{c:"var(--warn)",label:"At Risk"},pend:{c:"var(--pend)",label:"Pending"}};
+
+/* ---- render project cards ---- */
+const grid=document.getElementById('grid');
+function chipHtml(){return '';}
+function cardHtml(d,i){
+  const groups=(d.groups||[]).map(g=>{
+    const pns=(g.pns||[]).map(p=>`<span class="pn" data-pn="${p.toLowerCase()}">${p}</span>`).join('');
+    const tool=g.tool&&g.tool!=="—"?`<span class="tool">${g.tool}</span>`:'';
+    const flag=g.good?`<span class="badge good" style="font-size:10px;padding:2px 7px">on track</span>`:
+               g.pend?`<span class="badge pend" style="font-size:10px;padding:2px 7px">pending</span>`:'';
+    const sub=g.sub?`<div style="color:var(--muted);font-size:11.5px;margin-top:7px">${g.sub}</div>`:'';
+    return `<div class="subgrp"><div class="sg-h">${g.t}${flag}${tool}</div>${pns?`<div class="pns">${pns}</div>`:''}${sub}</div>`;
+  }).join('');
+  const tags=(d.tags||[]).map(t=>`<span class="tag">${t.k} <b>${t.v}</b></span>`).join('');
+  const note=d.note?`<p class="note ${d.note.w?'warn':''}">${d.note.t}</p>`:'';
+  const foot=[];
+  if(d.rec)foot.push(`<div class="milestone"><span class="k">Plan receive</span><span class="v rec">${d.rec}</span>${d.recNote?`<span class="k">· ${d.recNote}</span>`:''}</div>`);
+  if(d.load)foot.push(`<div class="milestone"><span class="k">Plan load</span><span class="v ${d.load.toLowerCase().includes('unknown')?'unk':'load'}">${d.load}</span>${d.loadNote?`<span class="k">· ${d.loadNote}</span>`:''}</div>`);
+  const search=[d.prog,d.div,d.lead,JSON.stringify(d.groups||[]),JSON.stringify(d.tags||[]),d.note?d.note.t:''].join(' ').toLowerCase();
+  return `<article class="pcard rv" data-div="${d.div}" data-search="${search.replace(/"/g,'&quot;')}" style="transition-delay:${i*40}ms">
+    <div class="pc-top">
+      <div class="ic">${d.ic}</div>
+      <div class="pc-tt"><div class="div">${d.div}</div><h3>${d.prog}</h3></div>
+      <span class="badge ${d.status}">${d.statusText}</span>
+      <svg class="caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+    <div class="collapse"><div class="pc-body">
+      <p class="pc-lead">${d.lead}</p>
+      ${groups}${tags?`<div class="tags">${tags}</div>`:''}${note}
+    </div>
+    ${foot.length?`<div class="pc-foot">${foot.join('')}</div>`:'<div style="height:8px"></div>'}
+    </div>
+  </article>`;
+}
+grid.innerHTML=DATA.map(cardHtml).join('');
+
+/* collapse toggle */
+grid.querySelectorAll('.pc-top').forEach(t=>t.addEventListener('click',e=>{
+  if(e.target.closest('.pn'))return;
+  t.closest('.pcard').classList.toggle('collapsed');
+}));
+
+/* ---- counts ---- */
+const nAll=DATA.length,nBMS=DATA.filter(d=>d.div==="BMS").length,nHSG=DATA.filter(d=>d.div==="HSG-HDD").length;
+document.getElementById('cAll').textContent=nAll;
+document.getElementById('cBMS').textContent=nBMS;
+document.getElementById('cHSG').textContent=nHSG;
+
+/* ---- filter + search ---- */
+const chips=document.getElementById('chips'),q=document.getElementById('q'),empty=document.getElementById('empty');
+let filter='all';
+function apply(){
+  const term=q.value.trim().toLowerCase();
+  let shown=0;
+  grid.querySelectorAll('.pcard').forEach(c=>{
+    const okDiv=filter==='all'||c.dataset.div===filter;
+    const okQ=!term||c.dataset.search.includes(term);
+    const show=okDiv&&okQ;c.classList.toggle('hide',!show);if(show)shown++;
+    c.querySelectorAll('.pn').forEach(p=>p.classList.toggle('hit',term&&p.dataset.pn.includes(term)));
+  });
+  empty.classList.toggle('show',shown===0);
+  document.getElementById('qEcho').textContent=term;
+}
+chips.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click',()=>{
+  chips.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed','false'));
+  ch.setAttribute('aria-pressed','true');filter=ch.dataset.f;apply();
+}));
+q.addEventListener('input',apply);
+
+/* ---- donut ---- */
+const counts={good:DATA.filter(d=>d.status==='good').length,warn:DATA.filter(d=>d.status==='warn').length,pend:DATA.filter(d=>d.status==='pend').length};
+const total=DATA.length,R=54,C=2*Math.PI*R,svg=document.getElementById('donut');
+let off=0;const order=['good','warn','pend'];
+svg.innerHTML=`<circle cx="66" cy="66" r="${R}" fill="none" stroke="var(--line)" stroke-width="15"/>`+
+ order.map(k=>{
+   const frac=counts[k]/total,len=frac*C,el=`<circle cx="66" cy="66" r="${R}" fill="none" stroke="${STATUS[k].c}" stroke-width="15" stroke-linecap="round" stroke-dasharray="0 ${C}" stroke-dashoffset="${-off}" data-len="${len}"/>`;
+   off+=len;return el;
+ }).join('');
+document.getElementById('legend').innerHTML=order.map(k=>
+ `<div class="it" data-s="${k}"><span class="sw" style="background:${STATUS[k].c}"></span>${STATUS[k].label}<b>${counts[k]}</b></div>`).join('');
+
+/* ---- timeline ---- */
+const tl=document.getElementById('timeline');
+tl.innerHTML=TIMELINE.map((n,i)=>{
+  const up=i%2===0;
+  const evs=n.evs.map(e=>`<div class="ev ${e.cls}"><b>${e.p}</b><span>${e.t}</span></div>`).join('');
+  return `<div class="node ${up?'up':'dn'}">
+    <div class="stem"></div>
+    <div class="tick ${n.warn?'warn':''}"></div>
+    <div class="box"><div class="date">${n.date}</div><div class="evs">${evs}</div></div>
+  </div>`;
+}).join('');
+
+/* ---- count-up + reveal ---- */
+const rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+function countUp(el){const to=+el.dataset.to;if(rm){el.textContent=to;return;}
+  let s=null;const dur=1100;
+  function step(t){if(!s)s=t;const p=Math.min((t-s)/dur,1);
+    el.textContent=Math.round((1-Math.pow(1-p,3))*to);if(p<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);}
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
+  e.target.classList.add('in');
+  if(e.target.classList.contains('kpi'))countUp(e.target.querySelector('.n'));
+  io.unobserve(e.target);}});},{threshold:.15});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+/* animate donut when visible */
+const dio=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
+  svg.querySelectorAll('circle[data-len]').forEach((c,idx)=>{
+    setTimeout(()=>{c.style.transition='stroke-dasharray 1s cubic-bezier(.2,.7,.2,1)';
+      c.setAttribute('stroke-dasharray',`${c.dataset.len} ${C}`);},idx*180+150);});
+  dio.disconnect();}});},{threshold:.3});
+dio.observe(svg);
+
+/* ---- theme ---- */
+const tb=document.getElementById('themeBtn'),root=document.documentElement;
+function setT(t){root.setAttribute('data-theme',t);tb.textContent=t==='dark'?'☀':'◐';}
+tb.addEventListener('click',()=>{
+  const cur=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  setT(cur==='dark'?'light':'dark');});
+</script>
